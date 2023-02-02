@@ -48,12 +48,23 @@ pipeline{
     }
         stage("Teardown"){
             steps{
-                echo "========Removing image after pushed to Azure registry========"
+                echo "Removing image after pushed to Azure registry"
                 sh '''
                   docker rmi petclinicspring.azurecr.io/petclinic/spring:$BUILD_NUMBER
                   docker image prune -f
                 '''
             }
+        }
+        
+        stage('Deployment to Azure K8s cluster') {
+            steps {           
+                sh 'pwd'
+                sh 'cp -R helm/* .'
+		        sh 'ls -ltr'
+                sh 'pwd'
+                sh '/usr/local/bin/helm upgrade --install petclinic-app petclinic  --set image.repository=petclinicspring.azurecr.io/petclinic/spring --set image.tag=$BUILD_NUMBER'
+              			
+            }           
         }
         
     }
