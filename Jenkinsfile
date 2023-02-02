@@ -9,7 +9,7 @@ pipeline{
         stage("Code Checkout") {
             steps {
                 echo "========Checking latest code for Build & Release========"
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/ravisinghrajput95/Jenkins-CICD-Azure-K8.git'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/ravisinghrajput95/Jenkins-AzureK8s-.git'
             }
         }
 
@@ -29,8 +29,9 @@ pipeline{
 
         stage('Copy Artifact') {
            steps { 
-                   sh 'pwd'
-		   sh 'cp -r target/*.jar docker'
+            echo "========Copy artifact========"
+            sh 'pwd'
+		    sh 'cp -r target/*.jar docker'
            }
         }
 
@@ -39,7 +40,7 @@ pipeline{
                 echo "========Building the Docker image========"
                 script {         
                    def customImage = docker.build('petclinic/spring', "./docker")
-                   docker.withRegistry('https://petclinicspring.azurecr.io', 'acr-demo') {
+                   docker.withRegistry('https://petclinicspring.azurecr.io', 'azure-registry') {
                    customImage.push("${env.BUILD_NUMBER}")
                 }  
             }
