@@ -41,11 +41,20 @@ pipeline{
                 script {         
                    def customImage = docker.build('petclinic/spring', "./docker")
                    docker.withRegistry('https://petclinicspring.azurecr.io', 'azure-registry') {
-                   customImage.push("${env.BUILD_NUMBER}")
+                   customImage.push("$BUILD_NUMBER")
                 }  
             }
         }
     }
+        stage("Teardown"){
+            steps{
+                echo "========Removing image after pushed to Azure registry========"
+                sh '''
+                  docker rmi petclinicspring.azurecr.io/petclinic/spring:$BUILD_NUMBER
+                  docker image prune -f
+                '''
+            }
+        }
         
     }
 }
